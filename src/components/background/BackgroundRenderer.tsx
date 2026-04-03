@@ -6,8 +6,8 @@ import { BackgroundConfig } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const BackgroundRenderer: React.FC = () => {
-  const { backgroundLayers, streams } = useAppStore();
-  const streamCount = streams.length;
+  const { backgroundLayers, channels } = useAppStore();
+  const streamCount = channels.length;
 
   // Performance Safeguard: Don't render animated backgrounds if > 8 streams
   const isPerformanceMode = streamCount > 8;
@@ -26,8 +26,9 @@ export const BackgroundRenderer: React.FC = () => {
       </AnimatePresence>
 
       {/* Global Effects Layer */}
-      <div className="absolute inset-0 pointer-events-none bg-noise opacity-[0.03]" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
       <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_200px_rgba(0,0,0,0.8)]" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/40 via-transparent to-black/20" />
     </div>
   );
 };

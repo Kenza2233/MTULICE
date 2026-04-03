@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "MULTILIVE - Production-Grade Multilive Streaming",
-  description: "Watch up to 12 live video streams simultaneously with zero buffering.",
+  title: "MULTILIVE - Web Platform Multiview",
+  description: "Watch up to 12 live video streams simultaneously from YouTube, Twitch, and more.",
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0f] text-white selection:bg-cyan-500/30`}>
         <BackgroundRenderer />
         <Header />

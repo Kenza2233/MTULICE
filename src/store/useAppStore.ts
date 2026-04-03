@@ -1,49 +1,52 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
-  Stream,
+  Channel,
   DisplaySettings,
   VideoPerformanceSettings,
   AudioSettings,
-  NetworkSettings,
   BackgroundConfig
 } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { BACKGROUND_PRESETS } from '@/lib/background/presets';
 
 interface AppStore {
-  streams: Stream[];
+  channels: Channel[];
   displaySettings: DisplaySettings;
   videoSettings: VideoPerformanceSettings;
   audioSettings: AudioSettings;
-  networkSettings: NetworkSettings;
   backgroundLayers: BackgroundConfig[];
+  recentUrls: string[];
   sidebarOpen: boolean;
   isSettingsOpen: boolean;
-  focusedStreamId: string | null;
+  focusedChannelId: string | null;
 
   // Actions
-  addStream: (stream: Omit<Stream, 'id' | 'order' | 'isVisible' | 'isMuted' | 'volume'>) => void;
-  removeStream: (id: string) => void;
-  updateStream: (id: string, updates: Partial<Stream>) => void;
-  reorderStreams: (newOrder: string[]) => void;
+  addChannel: (channel: Omit<Channel, 'id' | 'order' | 'addedAt' | 'isLive' | 'lastLiveCheck'>) => void;
+  removeChannel: (id: string) => void;
+  updateChannel: (id: string, updates: Partial<Channel>) => void;
+  reorderChannels: (newOrder: string[]) => void;
 
   setDisplaySettings: (settings: Partial<DisplaySettings>) => void;
   setVideoSettings: (settings: Partial<VideoPerformanceSettings>) => void;
   setAudioSettings: (settings: Partial<AudioSettings>) => void;
-  setNetworkSettings: (settings: Partial<NetworkSettings>) => void;
 
   setBackgroundLayers: (layers: BackgroundConfig[]) => void;
   updateBackgroundLayer: (id: string, updates: Partial<BackgroundConfig>) => void;
 
   setSidebarOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
-  setFocusedStreamId: (id: string | null) => void;
+  setFocusedChannelId: (id: string | null) => void;
+
+  importChannels: (channels: Channel[]) => void;
+  resetSettings: () => void;
+  randomizeBackground: () => void;
 }
 
 export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
-      streams: [],
+      channels: [],
       displaySettings: {
         gridLayout: 'auto',
         theme: 'dark',
@@ -55,74 +58,49 @@ export const useAppStore = create<AppStore>()(
         animatedTransitions: true,
       },
       videoSettings: {
-        defaultQuality: 'auto',
         maxStreams: 12,
-        hardwareAcceleration: true,
-        useWebWorker: true,
-        bufferSize: 3,
-        abrAggressiveness: 'balanced',
-        frameRateLimit: 0,
-        maxResolution: '1080p',
-        backgroundAudio: false,
+        showLabels: true,
       },
       audioSettings: {
         masterVolume: 1,
         audioDucking: true,
         audioDuckingPercentage: 30,
-        normalization: false,
       },
-      networkSettings: {
-        bandwidthLimit: 0,
-        connectionTimeout: 5,
-        reconnectAttempts: 5,
-        reconnectDelay: 2000,
-      },
-      backgroundLayers: [
-        {
-          id: 'base-layer',
-          name: 'Base Layer',
-          type: 'solid',
-          properties: {
-            color: '#0a0a0f',
-          },
-          layerSettings: {
-            opacity: 1,
-            blendMode: 'normal',
-            isVisible: true,
-          },
-        },
-      ],
+      backgroundLayers: BACKGROUND_PRESETS.Midnight,
+      recentUrls: [],
       sidebarOpen: true,
       isSettingsOpen: false,
-      focusedStreamId: null,
+      focusedChannelId: null,
 
-      addStream: (stream) => set((state) => ({
-        streams: [
-          ...state.streams,
-          {
-            ...stream,
-            id: uuidv4(),
-            order: state.streams.length,
-            isVisible: true,
-            isMuted: false,
-            volume: 1,
-          },
-        ],
-      })),
-
-      removeStream: (id) => set((state) => ({
-        streams: state.streams.filter((s) => s.id !== id),
-      })),
-
-      updateStream: (id, updates) => set((state) => ({
-        streams: state.streams.map((s) => (s.id === id ? { ...s, ...updates } : s)),
-      })),
-
-      reorderStreams: (newOrder) => set((state) => {
-        const streamMap = new Map(state.streams.map(s => [s.id, s]));
+      addChannel: (channel) => set((state) => {
+        const newChannel = {
+          ...channel,
+          id: uuidv4(),
+          order: state.channels.length,
+          addedAt: Date.now(),
+          isLive: true,
+          lastLiveCheck: Date.now(),
+        };
+        const updatedRecent = [channel.channelUrl, ...state.recentUrls.filter(u => u !== channel.channelUrl)].slice(0, 10);
         return {
-          streams: newOrder.map((id, index) => ({
-            ...streamMap.get(id)!,
+          channels: [...state.channels, newChannel],
+          recentUrls: updatedRecent
+        };
+      }),
+
+      removeChannel: (id) => set((state) => ({
+        channels: state.channels.filter((s) => s.id !== id),
+      })),
+
+      updateChannel: (id, updates) => set((state) => ({
+        channels: state.channels.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+      })),
+
+      reorderChannels: (newOrder) => set((state) => {
+        const channelMap = new Map(state.channels.map(s => [s.id, s]));
+        return {
+          channels: newOrder.map((id, index) => ({
+            ...channelMap.get(id)!,
             order: index,
           }))
         };
@@ -140,10 +118,6 @@ export const useAppStore = create<AppStore>()(
         audioSettings: { ...state.audioSettings, ...settings },
       })),
 
-      setNetworkSettings: (settings) => set((state) => ({
-        networkSettings: { ...state.networkSettings, ...settings },
-      })),
-
       setBackgroundLayers: (layers) => set({ backgroundLayers: layers }),
 
       updateBackgroundLayer: (id, updates) => set((state) => ({
@@ -154,17 +128,47 @@ export const useAppStore = create<AppStore>()(
 
       setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
       setSettingsOpen: (isSettingsOpen) => set({ isSettingsOpen }),
-      setFocusedStreamId: (focusedStreamId) => set({ focusedStreamId }),
+      setFocusedChannelId: (focusedChannelId) => set({ focusedChannelId }),
+
+      importChannels: (channels) => set({ channels }),
+
+      resetSettings: () => set({
+        displaySettings: {
+          gridLayout: 'auto',
+          theme: 'dark',
+          accentColor: '#00d4ff',
+          showLabels: true,
+          showClock: true,
+          fontSize: 14,
+          overlayOpacity: 0.8,
+          animatedTransitions: true,
+        },
+        videoSettings: {
+          maxStreams: 12,
+          showLabels: true,
+        },
+        audioSettings: {
+          masterVolume: 1,
+          audioDucking: true,
+          audioDuckingPercentage: 30,
+        },
+      }),
+
+      randomizeBackground: () => set((_state) => {
+        const presetKeys = Object.keys(BACKGROUND_PRESETS);
+        const randomKey = presetKeys[Math.floor(Math.random() * presetKeys.length)];
+        return { backgroundLayers: BACKGROUND_PRESETS[randomKey] };
+      }),
     }),
     {
       name: 'multilive-storage',
       partialize: (state) => ({
-        streams: state.streams,
+        channels: state.channels,
         displaySettings: state.displaySettings,
         videoSettings: state.videoSettings,
         audioSettings: state.audioSettings,
-        networkSettings: state.networkSettings,
         backgroundLayers: state.backgroundLayers,
+        recentUrls: state.recentUrls,
       }),
     }
   )

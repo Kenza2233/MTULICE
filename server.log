@@ -1,8 +1,8 @@
 
 > multilive@0.1.0 start
-> next start
+> next start -p 3001
 
 ▲ Next.js 16.2.2
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
-✓ Ready in 195ms
+- Local:         http://localhost:3001
+- Network:       http://192.168.0.2:3001
+✓ Ready in 196ms

@@ -5,7 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Tabs from "@radix-ui/react-tabs";
 import {
   X,
-  Settings,
+  Settings as SettingsIcon,
   Monitor,
   Zap,
   Volume2,
@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
+import { BACKGROUND_PRESETS } from "@/lib/background/presets";
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -27,8 +28,9 @@ export const SettingsModal: React.FC = () => {
     setVideoSettings,
     audioSettings,
     setAudioSettings,
-    networkSettings,
-    setNetworkSettings
+    resetSettings,
+    randomizeBackground,
+    setBackgroundLayers,
   } = useAppStore();
 
   const handleOpenChange = (open: boolean) => setSettingsOpen(open);
@@ -41,19 +43,19 @@ export const SettingsModal: React.FC = () => {
 
           <Tabs.Root defaultValue="display" className="flex w-full">
             {/* Sidebar Navigation */}
-            <div className="w-64 border-r border-white/5 bg-black/40 p-4 space-y-2">
+            <div className="w-64 border-r border-white/5 bg-black/40 p-4 space-y-2 relative">
               <div className="flex items-center gap-3 mb-6 px-2">
                 <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-black" />
+                  <SettingsIcon className="w-5 h-5 text-black" />
                 </div>
                 <h2 className="text-sm font-black tracking-widest uppercase text-white/80">Settings</h2>
               </div>
 
               <Tabs.List className="flex flex-col gap-1">
                 <TabButton value="display" icon={<Monitor className="w-4 h-4" />} label="Display" />
-                <TabButton value="video" icon={<Zap className="w-4 h-4" />} label="Video & Perf" />
+                <TabButton value="video" icon={<Zap className="w-4 h-4" />} label="UI & Grid" />
                 <TabButton value="audio" icon={<Volume2 className="w-4 h-4" />} label="Audio" />
-                <TabButton value="network" icon={<Globe className="w-4 h-4" />} label="Network" />
+                <TabButton value="network" icon={<Globe className="w-4 h-4" />} label="System" />
                 <TabButton value="background" icon={<Palette className="w-4 h-4" />} label="Background" />
               </Tabs.List>
 
@@ -67,9 +69,9 @@ export const SettingsModal: React.FC = () => {
             <div className="flex-1 flex flex-col min-w-0">
               <div className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/20">
                 <Tabs.Content value="display"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">Display Settings</h3></Tabs.Content>
-                <Tabs.Content value="video"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">Video & Performance</h3></Tabs.Content>
+                <Tabs.Content value="video"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">UI & Grid Performance</h3></Tabs.Content>
                 <Tabs.Content value="audio"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">Audio Engine</h3></Tabs.Content>
-                <Tabs.Content value="network"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">Network & Advanced</h3></Tabs.Content>
+                <Tabs.Content value="network"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">System & Advanced</h3></Tabs.Content>
                 <Tabs.Content value="background"><h3 className="text-sm font-bold uppercase tracking-widest text-white/60">Background Customization</h3></Tabs.Content>
 
                 <Dialog.Close asChild>
@@ -135,63 +137,33 @@ export const SettingsModal: React.FC = () => {
                 </Tabs.Content>
 
                 <Tabs.Content value="video" className="space-y-8 animate-in slide-in-from-right-2 duration-300">
-                  <div className="grid grid-cols-2 gap-8">
-                    <SettingGroup label="Default Quality">
-                      <select
-                        value={videoSettings.defaultQuality}
-                        onChange={(e) => setVideoSettings({ defaultQuality: e.target.value as import('@/types').VideoPerformanceSettings['defaultQuality'] })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white"
-                      >
-                        <option value="auto">Auto (Recommended)</option>
-                        <option value="highest">Highest (1080p+)</option>
-                        <option value="medium">Balanced (720p)</option>
-                        <option value="lowest">Economy (480p)</option>
-                        <option value="data-saver">Data Saver (360p)</option>
-                      </select>
-                    </SettingGroup>
-                    <SettingGroup label="Max Resolution">
-                      <select
-                        value={videoSettings.maxResolution}
-                        onChange={(e) => setVideoSettings({ maxResolution: e.target.value as import('@/types').VideoPerformanceSettings['maxResolution'] })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white"
-                      >
-                        <option value="1080p">1080p Full HD</option>
-                        <option value="720p">720p HD</option>
-                        <option value="480p">480p SD</option>
-                        <option value="4K">4K Ultra HD (Experimental)</option>
-                      </select>
-                    </SettingGroup>
-                  </div>
-
-                  <SettingGroup label="Buffer Configuration">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-white/60">Live Buffer: {videoSettings.bufferSize} Seconds</span>
-                        <span className="text-[10px] text-cyan-500 font-bold uppercase">Low Latency</span>
-                      </div>
-                      <input
-                        type="range" min="1" max="10" step="1"
-                        value={videoSettings.bufferSize}
-                        onChange={(e) => setVideoSettings({ bufferSize: parseInt(e.target.value) })}
-                        className="w-full h-1 bg-white/10 rounded-full appearance-none accent-cyan-500"
+                  <SettingGroup label="Grid Density">
+                    <div className="grid grid-cols-2 gap-8">
+                       <SettingToggle
+                        label="Animated Transitions"
+                        description="Smooth motion when rearranging grid"
+                        checked={displaySettings.animatedTransitions}
+                        onCheckedChange={(val) => setDisplaySettings({ animatedTransitions: val })}
                       />
-                      <p className="text-[10px] text-white/20">Lower buffer reduces latency but may cause stutter on weak connections.</p>
+                      <SettingToggle
+                        label="UI Glassmorphism"
+                        description="Apply frosted glass effect to overlays"
+                        checked={true}
+                        onCheckedChange={() => {}}
+                      />
                     </div>
                   </SettingGroup>
 
                   <div className="grid grid-cols-2 gap-8">
-                    <SettingToggle
-                      label="Hardware Acceleration"
-                      description="Offload video decoding to GPU"
-                      checked={videoSettings.hardwareAcceleration}
-                      onCheckedChange={(val) => setVideoSettings({ hardwareAcceleration: val })}
-                    />
-                    <SettingToggle
-                      label="Worker-based Decoding"
-                      description="Use WebWorkers to prevent UI lag"
-                      checked={videoSettings.useWebWorker}
-                      onCheckedChange={(val) => setVideoSettings({ useWebWorker: val })}
-                    />
+                    <SettingGroup label="Max Streams">
+                      <input
+                        type="number"
+                        min="1" max="12"
+                        value={videoSettings.maxStreams}
+                        onChange={(e) => setVideoSettings({ maxStreams: parseInt(e.target.value) })}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white"
+                      />
+                    </SettingGroup>
                   </div>
                 </Tabs.Content>
 
@@ -218,59 +190,32 @@ export const SettingsModal: React.FC = () => {
                       onCheckedChange={(val) => setAudioSettings({ audioDucking: val })}
                     />
                     <SettingToggle
-                      label="Volume Normalization"
-                      description="Keep all streams at similar loudness"
-                      checked={audioSettings.normalization}
-                      onCheckedChange={(val) => setAudioSettings({ normalization: val })}
+                      label="Global Mute"
+                      description="Mute all iframes simultaneously"
+                      checked={false}
+                      onCheckedChange={() => {}}
                     />
                   </div>
                 </Tabs.Content>
 
                 <Tabs.Content value="network" className="space-y-8 animate-in slide-in-from-right-2 duration-300">
-                  <SettingGroup label="Bandwidth Limit Override">
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="number"
-                        placeholder="Mbps (0 for unlimited)"
-                        value={networkSettings.bandwidthLimit || ''}
-                        onChange={(e) => setNetworkSettings({ bandwidthLimit: parseInt(e.target.value) || 0 })}
-                        className="w-32 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"
-                      />
-                      <span className="text-xs text-white/30">Caps total app bandwidth usage</span>
-                    </div>
-                  </SettingGroup>
-
-                   <div className="grid grid-cols-2 gap-8">
-                    <SettingGroup label="Connection Timeout">
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="number"
-                          value={networkSettings.connectionTimeout}
-                          onChange={(e) => setNetworkSettings({ connectionTimeout: parseInt(e.target.value) })}
-                          className="w-20 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white"
-                        />
-                        <span className="text-xs text-white/30">Seconds</span>
-                      </div>
-                    </SettingGroup>
-                    <SettingGroup label="Reconnect Delay">
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="number"
-                          value={networkSettings.reconnectDelay}
-                          onChange={(e) => setNetworkSettings({ reconnectDelay: parseInt(e.target.value) })}
-                          className="w-24 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white"
-                        />
-                        <span className="text-xs text-white/30">Milliseconds</span>
-                      </div>
-                    </SettingGroup>
-                  </div>
-
-                  <div className="pt-4 border-t border-white/5 flex gap-4">
-                    <Button variant="outline" className="border-red-500/50 text-red-500 hover:bg-red-500/10 h-10 px-6 font-bold text-[10px] uppercase">
-                      Clear App Cache
+                  <div className="pt-4 flex flex-col gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={resetSettings}
+                      className="w-full border-red-500/50 text-red-500 hover:bg-red-500/10 h-12 rounded-xl font-bold text-[10px] uppercase"
+                    >
+                      Reset All Settings
                     </Button>
-                    <Button variant="outline" className="border-white/10 text-white/60 hover:bg-white/5 h-10 px-6 font-bold text-[10px] uppercase">
-                      Export Diagnostic Log
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        localStorage.clear();
+                        window.location.reload();
+                      }}
+                      className="w-full border-white/10 text-white/60 hover:bg-white/5 h-12 rounded-xl font-bold text-[10px] uppercase"
+                    >
+                      Clear All Local Data & Reload
                     </Button>
                   </div>
                 </Tabs.Content>
@@ -286,30 +231,28 @@ export const SettingsModal: React.FC = () => {
                         <p className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest">Base Deep Dark</p>
                       </div>
                     </div>
-                    <Button className="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold uppercase h-9 px-4 rounded-lg">
-                      Edit Properties
-                    </Button>
                   </div>
 
                   <SettingGroup label="Quick Presets">
                     <div className="grid grid-cols-3 gap-3">
-                      {['Midnight', 'Cyberpunk', 'Cosmic', 'Gaming Neon', 'Cinema', 'Minimal'].map((preset) => (
+                      {Object.keys(BACKGROUND_PRESETS).map((preset) => (
                         <button
                           key={preset}
-                          className="h-20 rounded-xl bg-white/5 border border-white/5 hover:border-white/20 flex items-end p-3 transition-all"
+                          onClick={() => setBackgroundLayers(BACKGROUND_PRESETS[preset])}
+                          className="h-20 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/50 flex items-end p-3 transition-all group/preset"
                         >
-                          <span className="text-[8px] font-black uppercase tracking-widest text-white/40">{preset}</span>
+                          <span className="text-[8px] font-black uppercase tracking-widest text-white/40 group-hover/preset:text-cyan-500">{preset}</span>
                         </button>
                       ))}
                     </div>
                   </SettingGroup>
 
                   <div className="flex gap-4">
-                    <Button className="flex-1 bg-white text-black font-black h-12 rounded-xl text-xs">
+                    <Button
+                      onClick={randomizeBackground}
+                      className="flex-1 bg-white text-black font-black h-12 rounded-xl text-xs"
+                    >
                       RANDOMIZE BACKGROUND
-                    </Button>
-                    <Button variant="outline" className="flex-1 border-white/10 text-white font-black h-12 rounded-xl text-xs">
-                      COMPARE (BEFORE/AFTER)
                     </Button>
                   </div>
                 </Tabs.Content>
