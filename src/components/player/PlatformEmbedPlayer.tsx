@@ -2,19 +2,49 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Channel } from '@/types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppStore } from '@/store/useAppStore';
 
 interface PlatformEmbedPlayerProps {
   channel: Channel;
 }
 
 export const PlatformEmbedPlayer: React.FC<PlatformEmbedPlayerProps> = ({ channel }) => {
+  const { networkSettings } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [isInView, setIsInView] = useState(false);
   const [embedUrl, setEmbedUrl] = useState('');
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!networkSettings.lazyLoad && !networkSettings.autoPauseOffScreen) {
+      setIsInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [networkSettings.lazyLoad, networkSettings.autoPauseOffScreen]);
+
+  useEffect(() => {
+    if (!isInView && (networkSettings.lazyLoad || networkSettings.autoPauseOffScreen)) {
+      setEmbedUrl('');
+      setIsLoading(true);
+      return;
+    }
+
     setIsLoading(true);
     const getEmbedUrl = () => {
       const url = channel.channelUrl;
@@ -66,14 +96,22 @@ export const PlatformEmbedPlayer: React.FC<PlatformEmbedPlayerProps> = ({ channe
   };
 
   return (
-    <div className="relative w-full h-full bg-black group overflow-hidden rounded-lg">
-      {isLoading && (
+    <div ref={containerRef} className="relative w-full h-full bg-black group overflow-hidden rounded-lg">
+      {isLoading && isInView && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#0a0a0f]/40 backdrop-blur-sm">
           <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
         </div>
       )}
 
-      <iframe
+      {!isInView && (networkSettings.lazyLoad || networkSettings.autoPauseOffScreen) && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#0a0a0f] text-white/20 gap-2">
+          <EyeOff className="w-6 h-6" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Paused</span>
+        </div>
+      )}
+
+      {isInView && (
+        <iframe
         ref={iframeRef}
         src={embedUrl}
         className={cn(
@@ -82,9 +120,10 @@ export const PlatformEmbedPlayer: React.FC<PlatformEmbedPlayerProps> = ({ channe
         )}
         onLoad={handleLoad}
         loading="lazy"
-        sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+        sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
       />
+      )}
     </div>
   );
 };

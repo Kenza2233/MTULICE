@@ -7,9 +7,10 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { AddStreamModal } from "@/components/sidebar/AddStreamModal";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
-  const { channels, sidebarOpen } = useAppStore();
+  const { channels, sidebarOpen, interfaceSettings } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -21,18 +22,30 @@ export default function Home() {
 
   if (!mounted) return null;
 
+  const accentColor = interfaceSettings.accentColor;
+
   return (
-    <div className={`flex-1 overflow-hidden transition-all duration-300 ${sidebarOpen ? 'ml-72' : 'ml-0'}`}>
-      <div className="h-full w-full flex items-center justify-center p-4">
+    <div className={cn(
+      "flex-1 overflow-hidden transition-all",
+      interfaceSettings.animations ? "duration-300" : "duration-0",
+      sidebarOpen ? 'ml-72' : 'ml-0'
+    )}>
+      <div className={cn(
+        "h-full w-full flex items-center justify-center",
+        interfaceSettings.compactMode ? "p-1" : "p-4"
+      )}>
         {channels.length > 0 ? (
           <StreamGrid />
         ) : (
           <div className="flex flex-col items-center gap-8 text-center animate-in fade-in zoom-in duration-500">
             <div className="relative">
-              <div className="w-32 h-32 bg-cyan-500/10 border border-dashed border-cyan-500/20 rounded-3xl flex items-center justify-center animate-pulse">
-                <Plus className="w-10 h-10 text-cyan-500/40" />
+              <div
+                className="w-32 h-32 bg-white/5 border border-dashed rounded-3xl flex items-center justify-center animate-pulse"
+                style={{ borderColor: `${accentColor}40` }}
+              >
+                <Plus className="w-10 h-10" style={{ color: accentColor, opacity: 0.4 }} />
               </div>
-              <div className="absolute -inset-4 bg-cyan-500/5 blur-3xl -z-10 rounded-full" />
+              <div className="absolute -inset-4 blur-3xl -z-10 rounded-full" style={{ backgroundColor: `${accentColor}10` }} />
             </div>
 
             <div className="space-y-3">
@@ -44,7 +57,8 @@ export default function Home() {
 
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-cyan-500 hover:bg-cyan-600 text-black font-black h-14 px-10 rounded-2xl gap-3 shadow-2xl shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95"
+              className="font-black h-14 px-10 rounded-2xl gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95"
+              style={{ backgroundColor: accentColor, color: 'black', boxShadow: `0 10px 40px ${accentColor}40` }}
             >
               <Plus className="w-6 h-6" />
               ADD YOUR FIRST STREAM

@@ -29,24 +29,52 @@ export type GridPreference = 'auto' | '4x3' | '3x2' | '2x2';
 
 export interface DisplaySettings {
   gridLayout: GridPreference;
-  theme: 'dark' | 'light' | 'system';
-  accentColor: string;
   showLabels: boolean;
   showClock: boolean;
-  fontSize: number;
   overlayOpacity: number;
   animatedTransitions: boolean;
 }
 
-export interface VideoPerformanceSettings {
-  maxStreams: number;
-  showLabels?: boolean;
+export interface InterfaceSettings {
+  language: string;
+  theme: 'dark' | 'light' | 'system';
+  accentColor: string;
+  fontSize: number;
+  animations: boolean;
+  reducedMotion: boolean;
+  compactMode: boolean;
+  showFPS: boolean;
+  showStreamTimer: boolean;
+  tooltipDelay: number;
 }
 
-export interface AudioSettings {
-  masterVolume: number;
-  audioDucking: boolean;
-  audioDuckingPercentage: number;
+export interface NetworkSettings {
+  connectionOverride: 'auto' | 'wifi' | '4g' | '3g' | '2g' | 'slow';
+  maxStreams: number;
+  qualityYouTube: string;
+  qualityTwitch: string;
+  qualityKick: string;
+  qualityOther: string;
+  autoQuality: boolean;
+  enableBandwidthLimit: boolean;
+  bandwidthLimit: number; // Mbps
+  autoPauseOffScreen: boolean;
+  lazyLoad: boolean;
+  preloadStrategy: 'none' | 'conservative' | 'balanced' | 'aggressive';
+  connectionTimeout: number;
+  autoReconnect: boolean;
+  maxRetries: number;
+  retryDelay: number;
+  exponentialBackoff: boolean;
+  showDebugInfo: boolean;
+}
+
+export interface SpeedTestResult {
+  timestamp: number;
+  download: number;
+  upload: number;
+  ping: number;
+  jitter: number;
 }
 
 export type BackgroundType = 'solid' | 'gradient' | 'image' | 'video' | 'live' | 'youtube';
@@ -92,8 +120,9 @@ export interface BackgroundConfig {
 export interface AppState {
   channels: Channel[];
   displaySettings: DisplaySettings;
-  videoSettings: VideoPerformanceSettings;
-  audioSettings: AudioSettings;
+  interfaceSettings: InterfaceSettings;
+  networkSettings: NetworkSettings;
+  speedTestHistory: SpeedTestResult[];
   backgroundLayers: BackgroundConfig[];
   recentUrls: string[];
 }

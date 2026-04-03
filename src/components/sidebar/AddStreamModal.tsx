@@ -40,13 +40,15 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
   open,
   onOpenChange,
 }) => {
-  const { addChannel, recentUrls } = useAppStore();
+  const { addChannel, recentUrls, interfaceSettings } = useAppStore();
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [tags, setTags] = useState("");
   const [platform, setPlatform] = useState<PlatformType>('custom');
   const [priority, setPriority] = useState(3);
   const [error, setError] = useState<string | null>(null);
+
+  const accentColor = interfaceSettings.accentColor;
 
   // Auto-detection logic
   useEffect(() => {
@@ -107,7 +109,10 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
 
           <div className="flex items-center justify-between p-6 border-b border-white/5 bg-black/20">
             <Dialog.Title className="text-xl font-black tracking-tight text-white flex items-center gap-3">
-              <div className="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+                style={{ backgroundColor: accentColor, boxShadow: `0 8px 24px ${accentColor}33` }}
+              >
                 <Plus className="w-6 h-6 text-black" />
               </div>
               ADD LIVE STREAM
@@ -124,7 +129,7 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
             <form onSubmit={handleSubmit} className="flex-1 p-6 space-y-4 border-r border-white/5 overflow-y-auto">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                  <Link className="w-3 h-3 text-cyan-500" /> Live Stream Link
+                  <Link className="w-3 h-3" style={{ color: accentColor }} /> Live Stream Link
                 </label>
                 <div className="relative group">
                   <input
@@ -134,8 +139,9 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                     onChange={(e) => setUrl(e.target.value)}
                     className={cn(
                       "w-full bg-white/5 border rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none transition-all",
-                      error ? "border-red-500/50 focus:border-red-500" : "border-white/10 focus:border-cyan-500/50"
+                      error ? "border-red-500/50 focus:border-red-500" : "border-white/10"
                     )}
+                    style={!error && url ? { borderColor: `${accentColor}40` } : {}}
                   />
                   <Button
                     type="button"
@@ -156,25 +162,25 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Type className="w-3 h-3 text-cyan-500" /> Stream Name
+                    <Type className="w-3 h-3" style={{ color: accentColor }} /> Stream Name
                   </label>
                   <input
                     required
                     placeholder="Enter stream name..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Monitor className="w-3 h-3 text-cyan-500" /> Platform
+                    <Monitor className="w-3 h-3" style={{ color: accentColor }} /> Platform
                   </label>
                   <div className="relative">
                     <select
                       value={platform}
                       onChange={(e) => setPlatform(e.target.value as any)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white appearance-none focus:outline-none focus:border-cyan-500/50 transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white appearance-none focus:outline-none focus:border-white/20 transition-all"
                     >
                       {PLATFORMS.map(p => (
                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -188,18 +194,18 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Tag className="w-3 h-3 text-cyan-500" /> Tags
+                    <Tag className="w-3 h-3" style={{ color: accentColor }} /> Tags
                   </label>
                   <input
                     placeholder="e.g. Gaming, News..."
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Zap className="w-3 h-3 text-cyan-500" /> Priority (1-5)
+                    <Zap className="w-3 h-3" style={{ color: accentColor }} /> Priority (1-5)
                   </label>
                   <input
                     type="number"
@@ -207,7 +213,7 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                     max="5"
                     value={priority}
                     onChange={(e) => setPriority(parseInt(e.target.value))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-white/20 transition-all"
                   />
                 </div>
               </div>
@@ -215,7 +221,8 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
               <Button
                 type="submit"
                 disabled={!!error || !url || !name}
-                className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 disabled:hover:bg-cyan-500 text-black font-black h-12 rounded-xl gap-2 shadow-lg shadow-cyan-500/20 mt-4"
+                className="w-full disabled:opacity-50 text-black font-black h-12 rounded-xl gap-2 shadow-lg mt-4 transition-all"
+                style={{ backgroundColor: accentColor, color: 'black', boxShadow: `0 8px 24px ${accentColor}33` }}
               >
                 <Plus className="w-5 h-5" />
                 ADD TO GRID
@@ -232,9 +239,10 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                   <button
                     key={i}
                     onClick={() => setUrl(recentUrl)}
-                    className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/30 hover:bg-white/10 transition-all group"
+                    className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group"
+                    style={{ borderColor: url === recentUrl ? `${accentColor}40` : undefined }}
                   >
-                    <p className="text-[10px] text-white/40 group-hover:text-cyan-500 truncate font-mono">{recentUrl}</p>
+                    <p className="text-[10px] text-white/40 truncate font-mono group-hover:text-white" style={url === recentUrl ? { color: accentColor } : {}}>{recentUrl}</p>
                   </button>
                 ))}
                 {recentUrls.length === 0 && (

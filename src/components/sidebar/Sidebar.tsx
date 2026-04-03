@@ -44,10 +44,13 @@ export const Sidebar: React.FC = () => {
     setSidebarOpen,
     focusedChannelId,
     setFocusedChannelId,
-    importChannels
+    importChannels,
+    interfaceSettings
   } = useAppStore();
   const [search, setSearch] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const accentColor = interfaceSettings.accentColor;
 
   const filteredChannels = channels.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -84,7 +87,12 @@ export const Sidebar: React.FC = () => {
   if (!sidebarOpen) return null;
 
   return (
-    <aside className="fixed top-14 left-0 bottom-0 w-72 bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/5 z-40 transition-transform duration-300">
+    <aside
+      className={cn(
+        "fixed top-14 left-0 bottom-0 w-72 bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/5 z-40 transition-transform",
+        interfaceSettings.animations ? "duration-300" : "duration-0"
+      )}
+    >
       <div className="flex flex-col h-full">
         {/* Header */}
         <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
@@ -102,13 +110,14 @@ export const Sidebar: React.FC = () => {
         {/* Search */}
         <div className="p-4 bg-white/[0.01]">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-cyan-500 transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-cyan-500 transition-colors" style={{ color: search ? accentColor : undefined }} />
             <input
               type="text"
               placeholder="Filter by name or tags..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-[10px] font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 transition-all uppercase tracking-widest"
+              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-[10px] font-bold text-white placeholder:text-white/20 focus:outline-none transition-all uppercase tracking-widest"
+              style={{ borderColor: search ? `${accentColor}40` : undefined }}
             />
           </div>
         </div>
@@ -124,8 +133,9 @@ export const Sidebar: React.FC = () => {
                 onClick={() => setFocusedChannelId(channel.id)}
                 className={cn(
                   "group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-3",
-                  isActive ? "bg-cyan-500/10 border-cyan-500/50" : "bg-white/5 border-transparent hover:bg-white/[0.08]"
+                  isActive ? "bg-white/[0.04] border-current shadow-lg" : "bg-white/5 border-transparent hover:bg-white/[0.08]"
                 )}
+                style={isActive ? { color: accentColor, borderColor: accentColor } : {}}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5 overflow-hidden">
@@ -135,7 +145,7 @@ export const Sidebar: React.FC = () => {
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-[11px] font-black text-white/80 truncate uppercase tracking-tight">{channel.name}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[8px] font-black text-cyan-500/70 uppercase tracking-widest">{channel.platform}</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-60" style={{ color: accentColor }}>{channel.platform}</span>
                         <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
                       </div>
                     </div>
@@ -216,8 +226,9 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
           <Button
-            className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-black h-12 rounded-xl gap-2 shadow-lg shadow-cyan-500/20 transition-all active:scale-95"
+            className="w-full font-black h-12 rounded-xl gap-2 shadow-lg transition-all active:scale-95"
             onClick={() => setIsAddModalOpen(true)}
+            style={{ backgroundColor: accentColor, color: 'black', boxShadow: `0 8px 24px ${accentColor}33` }}
           >
             <Plus className="w-5 h-5" />
             ADD CHANNEL

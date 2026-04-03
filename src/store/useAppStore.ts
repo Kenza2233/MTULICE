@@ -3,8 +3,9 @@ import { persist } from 'zustand/middleware';
 import {
   Channel,
   DisplaySettings,
-  VideoPerformanceSettings,
-  AudioSettings,
+  InterfaceSettings,
+  NetworkSettings,
+  SpeedTestResult,
   BackgroundConfig
 } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,8 +14,9 @@ import { BACKGROUND_PRESETS } from '@/lib/background/presets';
 interface AppStore {
   channels: Channel[];
   displaySettings: DisplaySettings;
-  videoSettings: VideoPerformanceSettings;
-  audioSettings: AudioSettings;
+  interfaceSettings: InterfaceSettings;
+  networkSettings: NetworkSettings;
+  speedTestHistory: SpeedTestResult[];
   backgroundLayers: BackgroundConfig[];
   recentUrls: string[];
   sidebarOpen: boolean;
@@ -28,8 +30,10 @@ interface AppStore {
   reorderChannels: (newOrder: string[]) => void;
 
   setDisplaySettings: (settings: Partial<DisplaySettings>) => void;
-  setVideoSettings: (settings: Partial<VideoPerformanceSettings>) => void;
-  setAudioSettings: (settings: Partial<AudioSettings>) => void;
+  setInterfaceSettings: (settings: Partial<InterfaceSettings>) => void;
+  setNetworkSettings: (settings: Partial<NetworkSettings>) => void;
+  addSpeedTestResult: (result: SpeedTestResult) => void;
+  clearSpeedTestHistory: () => void;
 
   setBackgroundLayers: (layers: BackgroundConfig[]) => void;
   updateBackgroundLayer: (id: string, updates: Partial<BackgroundConfig>) => void;
@@ -43,29 +47,56 @@ interface AppStore {
   randomizeBackground: () => void;
 }
 
+const DEFAULT_DISPLAY: DisplaySettings = {
+  gridLayout: 'auto',
+  showLabels: true,
+  showClock: true,
+  overlayOpacity: 0.8,
+  animatedTransitions: true,
+};
+
+const DEFAULT_INTERFACE: InterfaceSettings = {
+  language: 'English',
+  theme: 'dark',
+  accentColor: '#00FFFF',
+  fontSize: 14,
+  animations: true,
+  reducedMotion: false,
+  compactMode: false,
+  showFPS: false,
+  showStreamTimer: true,
+  tooltipDelay: 300,
+};
+
+const DEFAULT_NETWORK: NetworkSettings = {
+  connectionOverride: 'auto',
+  maxStreams: 12,
+  qualityYouTube: 'Auto',
+  qualityTwitch: 'Auto',
+  qualityKick: 'Auto',
+  qualityOther: 'Auto',
+  autoQuality: true,
+  enableBandwidthLimit: false,
+  bandwidthLimit: 10,
+  autoPauseOffScreen: true,
+  lazyLoad: true,
+  preloadStrategy: 'balanced',
+  connectionTimeout: 15,
+  autoReconnect: true,
+  maxRetries: 3,
+  retryDelay: 5,
+  exponentialBackoff: true,
+  showDebugInfo: false,
+};
+
 export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       channels: [],
-      displaySettings: {
-        gridLayout: 'auto',
-        theme: 'dark',
-        accentColor: '#00d4ff',
-        showLabels: true,
-        showClock: true,
-        fontSize: 14,
-        overlayOpacity: 0.8,
-        animatedTransitions: true,
-      },
-      videoSettings: {
-        maxStreams: 12,
-        showLabels: true,
-      },
-      audioSettings: {
-        masterVolume: 1,
-        audioDucking: true,
-        audioDuckingPercentage: 30,
-      },
+      displaySettings: DEFAULT_DISPLAY,
+      interfaceSettings: DEFAULT_INTERFACE,
+      networkSettings: DEFAULT_NETWORK,
+      speedTestHistory: [],
       backgroundLayers: BACKGROUND_PRESETS.Midnight,
       recentUrls: [],
       sidebarOpen: true,
@@ -99,10 +130,10 @@ export const useAppStore = create<AppStore>()(
       reorderChannels: (newOrder) => set((state) => {
         const channelMap = new Map(state.channels.map(s => [s.id, s]));
         return {
-          channels: newOrder.map((id, index) => ({
-            ...channelMap.get(id)!,
-            order: index,
-          }))
+          channels: newOrder.map((id, index) => {
+            const ch = channelMap.get(id);
+            return ch ? { ...ch, order: index } : null;
+          }).filter(Boolean) as Channel[]
         };
       }),
 
@@ -110,13 +141,19 @@ export const useAppStore = create<AppStore>()(
         displaySettings: { ...state.displaySettings, ...settings },
       })),
 
-      setVideoSettings: (settings) => set((state) => ({
-        videoSettings: { ...state.videoSettings, ...settings },
+      setInterfaceSettings: (settings) => set((state) => ({
+        interfaceSettings: { ...state.interfaceSettings, ...settings },
       })),
 
-      setAudioSettings: (settings) => set((state) => ({
-        audioSettings: { ...state.audioSettings, ...settings },
+      setNetworkSettings: (settings) => set((state) => ({
+        networkSettings: { ...state.networkSettings, ...settings },
       })),
+
+      addSpeedTestResult: (result) => set((state) => ({
+        speedTestHistory: [result, ...state.speedTestHistory].slice(0, 5)
+      })),
+
+      clearSpeedTestHistory: () => set({ speedTestHistory: [] }),
 
       setBackgroundLayers: (layers) => set({ backgroundLayers: layers }),
 
@@ -133,25 +170,10 @@ export const useAppStore = create<AppStore>()(
       importChannels: (channels) => set({ channels }),
 
       resetSettings: () => set({
-        displaySettings: {
-          gridLayout: 'auto',
-          theme: 'dark',
-          accentColor: '#00d4ff',
-          showLabels: true,
-          showClock: true,
-          fontSize: 14,
-          overlayOpacity: 0.8,
-          animatedTransitions: true,
-        },
-        videoSettings: {
-          maxStreams: 12,
-          showLabels: true,
-        },
-        audioSettings: {
-          masterVolume: 1,
-          audioDucking: true,
-          audioDuckingPercentage: 30,
-        },
+        displaySettings: DEFAULT_DISPLAY,
+        interfaceSettings: DEFAULT_INTERFACE,
+        networkSettings: DEFAULT_NETWORK,
+        speedTestHistory: [],
       }),
 
       randomizeBackground: () => set((_state) => {
@@ -165,8 +187,9 @@ export const useAppStore = create<AppStore>()(
       partialize: (state) => ({
         channels: state.channels,
         displaySettings: state.displaySettings,
-        videoSettings: state.videoSettings,
-        audioSettings: state.audioSettings,
+        interfaceSettings: state.interfaceSettings,
+        networkSettings: state.networkSettings,
+        speedTestHistory: state.speedTestHistory,
         backgroundLayers: state.backgroundLayers,
         recentUrls: state.recentUrls,
       }),
