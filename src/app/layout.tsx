@@ -27,6 +27,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
+      <head>
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="dns-prefetch" href="https://www.youtube.com" />
+        <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+        <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
+        <link rel="preconnect" href="https://player.twitch.tv" />
+        <link rel="dns-prefetch" href="https://player.twitch.tv" />
+        <link rel="preconnect" href="https://kick.com" />
+        <link rel="dns-prefetch" href="https://kick.com" />
+        <link rel="preconnect" href="https://www.tiktok.com" />
+        <link rel="dns-prefetch" href="https://www.tiktok.com" />
+        <link rel="preconnect" href="https://www.facebook.com" />
+        <link rel="dns-prefetch" href="https://www.facebook.com" />
+        <link rel="preconnect" href="https://rumble.com" />
+        <link rel="dns-prefetch" href="https://rumble.com" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0f] text-white selection:bg-cyan-500/30`}>
         <BackgroundRenderer />
         <Header />
