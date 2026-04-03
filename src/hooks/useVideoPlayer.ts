@@ -27,6 +27,22 @@ export const useVideoPlayer = ({ stream, settings }: VideoPlayerProps) => {
     useHealthStore.getState().updateHealth(stream.id, metrics);
   }, [stream.id]);
 
+  const initPlayerRef = useRef<() => void>(() => {});
+
+  const handleFatalError = useCallback(() => {
+    updateHealth({ status: 'reconnecting' });
+    if (reconnectAttemptsRef.current < 3) {
+      reconnectAttemptsRef.current += 1;
+      const delay = Math.pow(2, reconnectAttemptsRef.current) * 1000;
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = setTimeout(() => {
+        initPlayerRef.current();
+      }, delay);
+    } else {
+      updateHealth({ status: 'offline' });
+    }
+  }, [updateHealth]);
+
   const initPlayer = useCallback(async () => {
     if (!videoRef.current || ['youtube', 'twitch', 'iframe'].includes(stream.type)) return;
     const video = videoRef.current;
@@ -149,21 +165,12 @@ export const useVideoPlayer = ({ stream, settings }: VideoPlayerProps) => {
       };
       video.onerror = () => handleFatalError();
     }
-  }, [stream, settings, updateHealth]);
+  }, [stream, settings, updateHealth, handleFatalError]);
 
-  const handleFatalError = useCallback(() => {
-    updateHealth({ status: 'reconnecting' });
-    if (reconnectAttemptsRef.current < 3) {
-      reconnectAttemptsRef.current += 1;
-      const delay = Math.pow(2, reconnectAttemptsRef.current) * 1000;
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = setTimeout(() => {
-        initPlayer();
-      }, delay);
-    } else {
-      updateHealth({ status: 'offline' });
-    }
-  }, [initPlayer, updateHealth]);
+  useEffect(() => {
+    initPlayerRef.current = initPlayer;
+  }, [initPlayer]);
+
 
   useEffect(() => {
     if (!stream.isVisible) {
