@@ -35,7 +35,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 export const StreamGrid: React.FC = () => {
-  const { channels, displaySettings, interfaceSettings, networkSettings, reorderChannels, focusedChannelId, setFocusedChannelId } = useAppStore();
+  const { channels, displaySettings, interfaceSettings, reorderChannels, focusedChannelId, setFocusedChannelId } = useAppStore();
   const sortedChannels = [...channels].sort((a, b) => a.order - b.order);
   const channelCount = sortedChannels.length;
   const [isMobile, setIsMobile] = useState(false);

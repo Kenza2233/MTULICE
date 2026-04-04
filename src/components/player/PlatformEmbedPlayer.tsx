@@ -31,11 +31,17 @@ export const PlatformEmbedPlayer: React.FC<PlatformEmbedPlayerProps> = ({ channe
       { threshold: 0.1 }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      observer.observe(currentContainer);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      if (currentContainer) {
+        observer.unobserve(currentContainer);
+      }
+      observer.disconnect();
+    };
   }, [networkSettings.lazyLoad, networkSettings.autoPauseOffScreen]);
 
   useEffect(() => {
@@ -89,7 +95,7 @@ export const PlatformEmbedPlayer: React.FC<PlatformEmbedPlayerProps> = ({ channe
     };
 
     setEmbedUrl(getEmbedUrl());
-  }, [channel.channelUrl, channel.platform]);
+  }, [channel.channelUrl, channel.platform, isInView, networkSettings.autoPauseOffScreen, networkSettings.lazyLoad]);
 
   const handleLoad = () => {
     setIsLoading(false);

@@ -1,0 +1,23 @@
+
+> multilive@0.1.0 dev
+> next dev --turbopack -p 3003
+
+▲ Next.js 16.2.2 (Turbopack)
+- Local:         http://localhost:3003
+- Network:       http://192.168.0.2:3003
+✓ Ready in 924ms
+
+ GET / 200 in 1537ms (next.js: 874ms, application-code: 663ms)
+[browser] React does not recognize the `searchQuery` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `searchquery` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+[browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.

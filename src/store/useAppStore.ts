@@ -176,7 +176,7 @@ export const useAppStore = create<AppStore>()(
         speedTestHistory: [],
       }),
 
-      randomizeBackground: () => set((_state) => {
+      randomizeBackground: () => set(() => {
         const presetKeys = Object.keys(BACKGROUND_PRESETS);
         const randomKey = presetKeys[Math.floor(Math.random() * presetKeys.length)];
         return { backgroundLayers: BACKGROUND_PRESETS[randomKey] };

@@ -17,7 +17,6 @@ import {
   ChevronRight,
   ChevronDown,
   Search,
-  Languages,
   Sun,
   Moon,
   Tv,
@@ -25,17 +24,9 @@ import {
   ArrowUpCircle,
   Activity,
   History,
-  Timer,
   RefreshCw,
   Info,
-  Shield,
-  Cpu,
-  MousePointer2,
-  Bell,
-  VolumeX,
-  Mic2,
-  HardDrive,
-  Database
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -98,7 +89,7 @@ export const SettingsModal: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Real-ish Speed test using navigator and fetch
-  const runSpeedTest = async () => {
+  const runSpeedTest = React.useCallback(async () => {
     setIsTesting(true);
 
     try {
@@ -113,7 +104,13 @@ export const SettingsModal: React.FC = () => {
       const speedMbps = parseFloat((sizeBits / durationSeconds / 1000000).toFixed(1));
 
       // Get connection info if available
-      const conn = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+      interface NetworkInformation extends EventTarget {
+        readonly bandwidth?: number;
+        readonly rtt?: number;
+      }
+      const conn = (navigator as unknown as { connection?: NetworkInformation }).connection ||
+                   (navigator as unknown as { mozConnection?: NetworkInformation }).mozConnection ||
+                   (navigator as unknown as { webkitConnection?: NetworkInformation }).webkitConnection;
 
       const result: SpeedTestResult = {
         timestamp: Date.now(),
@@ -129,13 +126,13 @@ export const SettingsModal: React.FC = () => {
     } finally {
       setIsTesting(false);
     }
-  };
+  }, [addSpeedTestResult]);
 
   useEffect(() => {
     if (activeTab === "network" && speedTestHistory.length === 0) {
       runSpeedTest();
     }
-  }, [activeTab]);
+  }, [activeTab, speedTestHistory.length, runSpeedTest]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -203,6 +200,7 @@ export const SettingsModal: React.FC = () => {
                   onClick={() => {
                     if (confirm("Reset all settings to default? This cannot be undone.")) {
                       resetSettings();
+                      clearSpeedTestHistory();
                     }
                   }}
                   className="text-[10px] font-bold text-white/20 hover:text-white transition-colors text-center uppercase tracking-wider"
@@ -409,10 +407,10 @@ export const SettingsModal: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-4 gap-2">
-                      <MetricCard icon={<ArrowDownCircle className="w-3.5 h-3.5" />} label="DOWN" value={currentResult.download} unit="Mbps" color={currentResult.download > 20 ? 'green' : currentResult.download > 5 ? 'yellow' : 'red'} />
-                      <MetricCard icon={<ArrowUpCircle className="w-3.5 h-3.5" />} label="UP" value={currentResult.upload} unit="Mbps" color={currentResult.upload > 10 ? 'green' : 'yellow'} />
-                      <MetricCard icon={<History className="w-3.5 h-3.5" />} label="PING" value={currentResult.ping} unit="ms" color={currentResult.ping < 50 ? 'green' : currentResult.ping < 100 ? 'yellow' : 'red'} />
-                      <MetricCard icon={<Activity className="w-3.5 h-3.5" />} label="JITTER" value={currentResult.jitter} unit="ms" />
+                      <MetricCard icon={<ArrowDownCircle className="w-3.5 h-3.5" />} value={currentResult.download} unit="Mbps" color={currentResult.download > 20 ? 'green' : currentResult.download > 5 ? 'yellow' : 'red'} />
+                      <MetricCard icon={<ArrowUpCircle className="w-3.5 h-3.5" />} value={currentResult.upload} unit="Mbps" color={currentResult.upload > 10 ? 'green' : 'yellow'} />
+                      <MetricCard icon={<History className="w-3.5 h-3.5" />} value={currentResult.ping} unit="ms" color={currentResult.ping < 50 ? 'green' : currentResult.ping < 100 ? 'yellow' : 'red'} />
+                      <MetricCard icon={<Activity className="w-3.5 h-3.5" />} value={currentResult.jitter} unit="ms" />
                     </div>
 
                     <div className="space-y-1.5 pt-1">
@@ -609,14 +607,16 @@ const TabButton: React.FC<{ value: string; icon: React.ReactNode; label: string;
   );
 };
 
-const SettingGroup: React.FC<{
+interface SettingGroupProps {
   label: string;
   children: React.ReactNode;
   id: string;
   collapsed?: boolean;
   onToggle: (id: string) => void;
   searchQuery: string;
-}> = ({ label, children, id, collapsed, onToggle, searchQuery }) => {
+}
+
+const SettingGroup: React.FC<SettingGroupProps> = ({ label, children, id, collapsed, onToggle, searchQuery }) => {
   // If the group label matches the search, show the group and all its children
   const isGroupMatch = !searchQuery || label.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -636,7 +636,7 @@ const SettingGroup: React.FC<{
           {React.Children.map(children, child => {
             if (React.isValidElement(child)) {
               // Pass searchQuery to children so they can filter themselves if the group didn't match
-              return React.cloneElement(child as React.ReactElement<any>, { searchQuery });
+              return React.cloneElement(child as React.ReactElement<{ searchQuery?: string }>, { searchQuery });
             }
             return child;
           })}
@@ -657,8 +657,7 @@ const SettingToggle: React.FC<{
   onCheckedChange: (checked: boolean) => void;
   searchQuery?: string;
 }> = ({ label, description, checked, onCheckedChange, searchQuery }) => {
-  const { interfaceSettings } = useAppStore();
-  const accentColor = interfaceSettings.accentColor;
+  const accentColor = useAppStore(state => state.interfaceSettings.accentColor);
 
   if (searchQuery && !label.toLowerCase().includes(searchQuery.toLowerCase()) && !description.toLowerCase().includes(searchQuery.toLowerCase())) return null;
 
@@ -711,9 +710,9 @@ const LayoutButton: React.FC<{
   label: string;
   searchQuery?: string;
 }> = ({ active, onClick, icon, label, searchQuery }) => {
+  const accentColor = useAppStore(state => state.interfaceSettings.accentColor);
+
   if (searchQuery && !label.toLowerCase().includes(searchQuery.toLowerCase())) return null;
-  const { interfaceSettings } = useAppStore();
-  const accentColor = interfaceSettings.accentColor;
 
   return (
     <button
@@ -744,9 +743,9 @@ const CompactSlider: React.FC<{
   suffix?: string;
   searchQuery?: string;
 }> = ({ label, value, min = 0, max = 1, step = 0.01, onChange, suffix = "%", searchQuery }) => {
+  const accentColor = useAppStore(state => state.interfaceSettings.accentColor);
+
   if (searchQuery && !label.toLowerCase().includes(searchQuery.toLowerCase())) return null;
-  const { interfaceSettings } = useAppStore();
-  const accentColor = interfaceSettings.accentColor;
   const displayValue = suffix === "%" ? Math.round(value * 100) : value;
 
   return (
@@ -774,7 +773,7 @@ const CompactSlider: React.FC<{
   );
 };
 
-const MetricCard: React.FC<{ icon: React.ReactNode, label: string, value: number, unit: string, color?: 'green' | 'yellow' | 'red' }> = ({ icon, label, value, unit, color }) => (
+const MetricCard: React.FC<{ icon: React.ReactNode, value: number, unit: string, color?: 'green' | 'yellow' | 'red' }> = ({ icon, value, unit, color }) => (
   <div className="p-2 rounded-lg bg-black/40 border border-white/5 flex flex-col items-center gap-1">
     <div className="text-white/20">{icon}</div>
     <div className={cn(

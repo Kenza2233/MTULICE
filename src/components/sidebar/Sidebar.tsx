@@ -5,7 +5,6 @@ import { useAppStore } from '@/store/useAppStore';
 import {
   Search,
   Trash2,
-  Settings2,
   Plus,
   ChevronLeft,
   Tag,

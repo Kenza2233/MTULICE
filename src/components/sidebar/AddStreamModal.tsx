@@ -179,7 +179,7 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                   <div className="relative">
                     <select
                       value={platform}
-                      onChange={(e) => setPlatform(e.target.value as any)}
+                      onChange={(e) => setPlatform(e.target.value as PlatformType)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white appearance-none focus:outline-none focus:border-white/20 transition-all"
                     >
                       {PLATFORMS.map(p => (
