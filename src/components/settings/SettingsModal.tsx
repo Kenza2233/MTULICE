@@ -158,20 +158,35 @@ export const SettingsModal: React.FC = () => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] animate-in fade-in duration-200" />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[520px] h-[80vh] bg-[#0a0a0f] border border-white/10 rounded-2xl shadow-2xl z-[101] flex flex-col md:flex-row overflow-hidden animate-in slide-in-from-right-1/4 duration-200 ease-out"
+          className="fixed top-0 left-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-screen h-screen md:w-full md:max-w-[520px] md:h-[80vh] bg-[#0a0a0f] md:border md:border-white/10 md:rounded-2xl shadow-2xl z-[101] flex flex-col overflow-hidden animate-in slide-in-from-bottom md:slide-in-from-right-1/4 duration-200 ease-out"
         >
-          <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="flex w-full h-full">
-            {/* Sidebar Navigation */}
-            <div className="w-[160px] border-r border-white/5 bg-black/40 p-0 relative flex flex-col shrink-0">
-              <div className="p-4 flex flex-col gap-3">
+          <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="flex flex-col md:flex-row w-full h-full">
+            {/* Header / Sidebar Navigation */}
+            <div className="w-full md:w-[160px] md:border-r border-white/5 bg-black/40 p-0 relative flex flex-col shrink-0">
+              {/* Mobile/Tablet Header */}
+              <div className="flex md:hidden items-center justify-between p-4 bg-black/40 border-b border-white/5">
                 <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-cyan-500 rounded flex items-center justify-center">
+                    <SettingsIcon className="w-3 h-3 text-black" />
+                  </div>
+                  <h2 className="text-sm font-black tracking-widest uppercase text-white">Settings</h2>
+                </div>
+                <Dialog.Close asChild>
+                  <button className="h-10 w-10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 rounded-md transition-all">
+                    <X className="h-6 w-6" />
+                  </button>
+                </Dialog.Close>
+              </div>
+
+              <div className="p-4 flex flex-col gap-3">
+                <div className="hidden md:flex items-center gap-2">
                   <div className="w-5 h-5 bg-cyan-500 rounded flex items-center justify-center">
                     <SettingsIcon className="w-3 h-3 text-black" />
                   </div>
                   <h2 className="text-[11px] font-black tracking-widest uppercase text-white/80">Settings</h2>
                 </div>
 
-                <div className="relative group">
+                <div className="relative group w-full">
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/20 group-focus-within:text-cyan-500" />
                   <input
                     ref={searchInputRef}
@@ -179,12 +194,12 @@ export const SettingsModal: React.FC = () => {
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-md py-1.5 pl-7 pr-2 text-[11px] text-white focus:outline-none focus:border-cyan-500/50 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-md py-1.5 pl-7 pr-2 text-xs md:text-[11px] text-white focus:outline-none focus:border-cyan-500/50 transition-all"
                   />
                 </div>
               </div>
 
-              <Tabs.List className="flex-1 flex flex-col gap-0 py-1 overflow-y-auto custom-scrollbar-settings">
+              <Tabs.List className="flex flex-row md:flex-col gap-0 py-1 overflow-x-auto md:overflow-y-auto custom-scrollbar-settings border-b md:border-b-0 border-white/5 sticky top-0 bg-[#0a0a0f] md:bg-transparent z-10">
                   <TabButton value="display" icon={<Monitor className="w-4 h-4" />} label="Display" searchQuery={searchQuery} />
                   <TabButton value="interface" icon={<LayoutGrid className="w-4 h-4" />} label="Interface" searchQuery={searchQuery} />
                   <TabButton value="video" icon={<Zap className="w-4 h-4" />} label="UI & Grid" searchQuery={searchQuery} />
@@ -195,7 +210,7 @@ export const SettingsModal: React.FC = () => {
                   <TabButton value="advanced" icon={<Shield className="w-4 h-4" />} label="Advanced" searchQuery={searchQuery} />
               </Tabs.List>
 
-              <div className="mt-auto p-4 flex flex-col gap-2 border-t border-white/5">
+              <div className="hidden md:flex mt-auto p-4 flex-col gap-2 border-t border-white/5">
                 <button
                   onClick={() => {
                     if (confirm("Reset all settings to default? This cannot be undone.")) {
@@ -212,8 +227,8 @@ export const SettingsModal: React.FC = () => {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 bg-[#0a0a0f] relative">
-              <div className="h-14 border-b border-white/5 flex items-center justify-between px-5 bg-black/10">
+            <div className="flex-1 flex flex-col min-w-0 bg-[#0a0a0f] relative overflow-hidden">
+              <div className="hidden md:flex h-14 border-b border-white/5 items-center justify-between px-5 bg-black/10">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
                   {TAB_TITLES[activeTab]}
                 </h3>
@@ -225,7 +240,7 @@ export const SettingsModal: React.FC = () => {
                 </Dialog.Close>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 px-5 custom-scrollbar-settings">
+              <div className="flex-1 overflow-y-auto p-4 px-5 md:pb-4 pb-20 custom-scrollbar-settings">
                 <Tabs.Content value="display" className="space-y-0 outline-none animate-in fade-in duration-200">
                   <SettingGroup label="GRID LAYOUT" id="display-grid" collapsed={collapsedSections['display-grid']} onToggle={toggleSection} searchQuery={searchQuery}>
                     <div className="grid grid-cols-2 gap-2">
@@ -521,6 +536,20 @@ export const SettingsModal: React.FC = () => {
                     </div>
                    </SettingGroup>
                    <SectionDivider />
+                   <SettingGroup label="YOUTUBE API" id="sys-yt" collapsed={collapsedSections['sys-yt']} onToggle={toggleSection} searchQuery={searchQuery}>
+                    <div className="space-y-2 py-1">
+                      <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest">API KEY</label>
+                      <input
+                        type="password"
+                        placeholder="Enter YouTube Data API v3 Key"
+                        value={networkSettings.youtubeApiKey || ''}
+                        onChange={(e) => setNetworkSettings({ youtubeApiKey: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"
+                      />
+                      <p className="text-[9px] text-white/20 leading-relaxed">Required for YouTube channel search and live status monitoring.</p>
+                    </div>
+                   </SettingGroup>
+                   <SectionDivider />
                    <SettingGroup label="UPDATES" id="sys-upd" collapsed={collapsedSections['sys-upd']} onToggle={toggleSection} searchQuery={searchQuery}>
                     <div className="flex items-center justify-between py-2">
                       <span className="text-[11px] text-white/40 font-bold tracking-widest uppercase">CURRENT VERSION</span>
@@ -599,7 +628,7 @@ const TabButton: React.FC<{ value: string; icon: React.ReactNode; label: string;
   return (
     <Tabs.Trigger
       value={value}
-      className="group flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-[#888] transition-all duration-150 relative border-l-[2px] border-transparent hover:bg-white/[0.04] hover:text-[#aaa] data-[state=active]:border-cyan-500 data-[state=active]:bg-cyan-500/[0.04] data-[state=active]:text-white"
+      className="group flex items-center gap-2 px-4 py-3 md:px-3 md:py-2 text-[13px] font-medium text-[#888] transition-all duration-150 relative border-b-2 md:border-b-0 md:border-l-[2px] border-transparent hover:bg-white/[0.04] hover:text-[#aaa] data-[state=active]:border-cyan-500 data-[state=active]:bg-cyan-500/[0.04] data-[state=active]:text-white whitespace-nowrap shrink-0"
     >
       <span className="shrink-0 group-data-[state=active]:text-white">{icon}</span>
       {label}

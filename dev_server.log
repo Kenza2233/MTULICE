@@ -1,13 +1,13 @@
 
 > multilive@0.1.0 dev
-> next dev --turbopack -p 3003
+> next dev --turbopack -p 3002
 
 ▲ Next.js 16.2.2 (Turbopack)
-- Local:         http://localhost:3003
-- Network:       http://192.168.0.2:3003
-✓ Ready in 924ms
+- Local:         http://localhost:3002
+- Network:       http://192.168.0.2:3002
+✓ Ready in 1197ms
 
- GET / 200 in 1537ms (next.js: 874ms, application-code: 663ms)
+ GET / 200 in 797ms (next.js: 334ms, application-code: 463ms)
 [browser] React does not recognize the `searchQuery` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `searchquery` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
 [browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
 
@@ -21,3 +21,48 @@ If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden c
 
 For more information, see https://radix-ui.com/primitives/docs/components/dialog
 [browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+ GET / 200 in 217ms (next.js: 10ms, application-code: 207ms)
+[browser] React does not recognize the `searchQuery` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `searchquery` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+[browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+ GET / 200 in 110ms (next.js: 4ms, application-code: 106ms)
+[browser] React does not recognize the `searchQuery` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `searchquery` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+[browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[browser] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[browser] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+ GET /api/youtube/search?q=Lofi%20Girl&key= 200 in 1451ms (next.js: 956ms, application-code: 495ms)
+ GET /api/youtube/search?q=Lofi%20Girl&key= 200 in 531ms (next.js: 4ms, application-code: 527ms)
+ GET /api/youtube/search?q=Lofi%20Girl&key= 200 in 427ms (next.js: 3ms, application-code: 423ms)
+ GET / 200 in 104ms (next.js: 9ms, application-code: 96ms)
+ GET /api/youtube/search?q=Music&key= 200 in 1286ms (next.js: 5ms, application-code: 1282ms)
+ GET /channel/UCpW5Bi2Zf-WUdSu3IBF6FKA 404 in 1714ms (next.js: 1198ms, application-code: 516ms)
+ GET /@MusicTravelLove 404 in 1741ms (next.js: 1374ms, application-code: 367ms)
+ GET /channel/UCUa7ABwNB4BdvwIEvsS_n0g 404 in 1722ms (next.js: 1296ms, application-code: 426ms)
+ GET /channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ 404 in 1732ms (next.js: 1335ms, application-code: 397ms)
+ GET /@RelaxCafeMusic 404 in 1725ms (next.js: 1270ms, application-code: 454ms)
+ GET /@knoPianoMusic 404 in 1721ms (next.js: 1240ms, application-code: 481ms)
+ GET /@OneCoolMusic 404 in 344ms (next.js: 17ms, application-code: 327ms)
+ GET /@songsofbirdland 404 in 339ms (next.js: 83ms, application-code: 256ms)
+ GET /@MusicLabChill 404 in 337ms (next.js: 161ms, application-code: 176ms)
+ GET /@SuRuRuToons 404 in 262ms (next.js: 161ms, application-code: 102ms)

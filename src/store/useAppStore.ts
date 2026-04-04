@@ -87,6 +87,7 @@ const DEFAULT_NETWORK: NetworkSettings = {
   retryDelay: 5,
   exponentialBackoff: true,
   showDebugInfo: false,
+  youtubeApiKey: '',
 };
 
 export const useAppStore = create<AppStore>()(

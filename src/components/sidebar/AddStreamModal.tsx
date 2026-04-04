@@ -17,12 +17,15 @@ import {
   Facebook,
   History,
   Clipboard,
-  AlertCircle
+  AlertCircle,
+  Star,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 import { PlatformType } from "@/types";
 import { cn } from "@/lib/utils";
+import { YouTubeSearchOverlay } from "../youtube/YouTubeSearchOverlay";
 
 const PLATFORMS = [
   { id: 'youtube', name: 'YouTube Live', icon: <Youtube className="w-4 h-4" /> },
@@ -47,6 +50,7 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
   const [platform, setPlatform] = useState<PlatformType>('custom');
   const [priority, setPriority] = useState(3);
   const [error, setError] = useState<string | null>(null);
+  const [isYTSearchOpen, setIsYTSearchOpen] = useState(false);
 
   const accentColor = interfaceSettings.accentColor;
 
@@ -105,28 +109,77 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] animate-in fade-in" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-[#12121a] border border-white/10 rounded-2xl p-0 shadow-2xl z-[101] overflow-hidden animate-in zoom-in-95 duration-200">
+        <Dialog.Content className="fixed top-0 left-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-screen h-screen md:w-full md:max-w-xl bg-[#12121a] md:border md:border-white/10 md:rounded-2xl p-0 shadow-2xl z-[101] overflow-hidden animate-in md:zoom-in-95 slide-in-from-bottom md:slide-in-from-none duration-200">
 
-          <div className="flex items-center justify-between p-6 border-b border-white/5 bg-black/20">
-            <Dialog.Title className="text-xl font-black tracking-tight text-white flex items-center gap-3">
+          <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/5 bg-black/20">
+            <Dialog.Title className="text-lg md:text-xl font-black tracking-tight text-white flex items-center gap-3">
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+                className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg"
                 style={{ backgroundColor: accentColor, boxShadow: `0 8px 24px ${accentColor}33` }}
               >
-                <Plus className="w-6 h-6 text-black" />
+                <Plus className="w-5 h-5 md:w-6 md:h-6 text-black" />
               </div>
               ADD LIVE STREAM
             </Dialog.Title>
             <Dialog.Close asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white">
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-10 w-10 text-white/40 hover:text-white">
+                <X className="h-6 w-6 md:h-4 md:w-4" />
               </Button>
             </Dialog.Close>
           </div>
 
-          <div className="flex h-[500px]">
+          <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] md:h-[500px] overflow-y-auto custom-scrollbar">
             {/* Left Column: Form */}
             <form onSubmit={handleSubmit} className="flex-1 p-6 space-y-4 border-r border-white/5 overflow-y-auto">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsYTSearchOpen(true)}
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 transition-colors"
+                >
+                  <Search className="w-3 h-3" />
+                  Search YouTube
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
+                  <Monitor className="w-3 h-3" style={{ color: accentColor }} /> Platform
+                </label>
+                <div className="flex md:hidden overflow-x-auto gap-2 pb-2 custom-scrollbar no-scrollbar">
+                  {PLATFORMS.map((p) => {
+                    const isActive = platform === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPlatform(p.id as PlatformType)}
+                        className={cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-full border text-[13px] font-bold whitespace-nowrap transition-all",
+                          isActive ? "border-current bg-current/10" : "border-white/10 text-white/40"
+                        )}
+                        style={isActive ? { color: accentColor, borderColor: accentColor } : {}}
+                      >
+                        {p.icon}
+                        {p.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="hidden md:relative md:block">
+                  <select
+                    value={platform}
+                    onChange={(e) => setPlatform(e.target.value as PlatformType)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white appearance-none focus:outline-none focus:border-white/20 transition-all"
+                  >
+                    {PLATFORMS.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
                   <Link className="w-3 h-3" style={{ color: accentColor }} /> Live Stream Link
@@ -134,11 +187,11 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                 <div className="relative group">
                   <input
                     required
-                    placeholder="Paste channel or video URL..."
+                    placeholder="Paste YouTube, Twitch, or other live link..."
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     className={cn(
-                      "w-full bg-white/5 border rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none transition-all",
+                      "w-full bg-white/5 border rounded-xl px-4 py-4 md:py-3 text-base md:text-xs text-white placeholder:text-white/20 focus:outline-none transition-all h-[52px] md:h-auto",
                       error ? "border-red-500/50 focus:border-red-500" : "border-white/10"
                     )}
                     style={!error && url ? { borderColor: `${accentColor}40` } : {}}
@@ -146,9 +199,9 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                   <Button
                     type="button"
                     onClick={handlePaste}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/5 hover:bg-white/10 text-white/40"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 md:h-8 md:w-8 bg-white/10 hover:bg-white/20 text-white"
                   >
-                    <Clipboard className="w-3.5 h-3.5" />
+                    <Clipboard className="w-4 h-4 md:w-3.5 md:h-3.5" />
                   </Button>
                 </div>
                 {error && (
@@ -157,9 +210,15 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                     {error}
                   </div>
                 )}
+                {url && !error && (
+                   <div className="flex items-center gap-2 px-2 py-1 bg-white/5 rounded-full w-fit border border-white/5">
+                      {PLATFORMS.find(p => p.id === platform)?.icon}
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{PLATFORMS.find(p => p.id === platform)?.name}</span>
+                   </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
                     <Type className="w-3 h-3" style={{ color: accentColor }} /> Stream Name
@@ -169,68 +228,80 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
                     placeholder="Enter stream name..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 md:py-3 text-base md:text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all h-[52px] md:h-auto"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Monitor className="w-3 h-3" style={{ color: accentColor }} /> Platform
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={platform}
-                      onChange={(e) => setPlatform(e.target.value as PlatformType)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white appearance-none focus:outline-none focus:border-white/20 transition-all"
-                    >
-                      {PLATFORMS.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Tag className="w-3 h-3" style={{ color: accentColor }} /> Tags
+                    <Tag className="w-3 h-3" style={{ color: accentColor }} /> Tags (Optional)
                   </label>
                   <input
                     placeholder="e.g. Gaming, News..."
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 md:py-3 text-base md:text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all h-[52px] md:h-auto"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-                    <Zap className="w-3 h-3" style={{ color: accentColor }} /> Priority (1-5)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={priority}
-                    onChange={(e) => setPriority(parseInt(e.target.value))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-white/20 transition-all"
-                  />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
+                  <Zap className="w-3 h-3" style={{ color: accentColor }} /> Priority
+                </label>
+                <div className="flex items-center gap-3 py-2">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setPriority(s)}
+                      className="transition-transform active:scale-90"
+                    >
+                      <Star
+                        className={cn(
+                          "w-8 h-8 md:w-6 md:h-6 transition-colors",
+                          s <= priority ? "fill-current" : "text-white/10"
+                        )}
+                        style={s <= priority ? { color: accentColor } : {}}
+                      />
+                    </button>
+                  ))}
+                  <span className="ml-2 text-xs font-black text-white/40 uppercase tracking-widest">{priority}/5</span>
                 </div>
               </div>
 
               <Button
                 type="submit"
                 disabled={!!error || !url || !name}
-                className="w-full disabled:opacity-50 text-black font-black h-12 rounded-xl gap-2 shadow-lg mt-4 transition-all"
+                className="w-full disabled:opacity-50 text-black font-black h-[52px] rounded-xl gap-2 shadow-lg mt-4 transition-all"
                 style={{ backgroundColor: accentColor, color: 'black', boxShadow: `0 8px 24px ${accentColor}33` }}
               >
                 <Plus className="w-5 h-5" />
-                ADD TO GRID
+                ADD STREAM
               </Button>
+
+              {/* Mobile Recents list integrated in main scroll on mobile */}
+              <div className="md:hidden pt-8 pb-4">
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2 mb-4">
+                  <History className="w-3 h-3" /> Recent URLs
+                </h3>
+                <div className="space-y-2">
+                   {recentUrls.map((recentUrl, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setUrl(recentUrl)}
+                      className="w-full text-left p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between"
+                    >
+                      <span className="text-xs text-white/60 truncate font-mono flex-1">{recentUrl}</span>
+                      <ChevronDown className="w-4 h-4 text-white/20 -rotate-90" />
+                    </button>
+                   ))}
+                </div>
+              </div>
             </form>
 
-            {/* Right Column: Recents */}
-            <div className="w-52 p-6 bg-white/[0.02] flex flex-col">
+            {/* Right Column: Recents (Desktop Only) */}
+            <div className="hidden md:flex w-52 p-6 bg-white/[0.02] flex-col">
               <h3 className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2 mb-4">
                 <History className="w-3 h-3" /> Recent URLs
               </h3>
@@ -251,6 +322,7 @@ export const AddStreamModal: React.FC<{ open: boolean; onOpenChange: (open: bool
               </div>
             </div>
           </div>
+          {isYTSearchOpen && <YouTubeSearchOverlay onClose={() => setIsYTSearchOpen(false)} />}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

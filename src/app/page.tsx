@@ -7,12 +7,15 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { AddStreamModal } from "@/components/sidebar/AddStreamModal";
+import { BottomNav } from "@/components/layout/BottomNav";
+import { ChannelsPage } from "@/components/channels/ChannelsPage";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { channels, sidebarOpen, interfaceSettings } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('streams');
 
   useKeyboardShortcuts();
 
@@ -20,13 +23,20 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (activeTab === 'add') {
+      setIsAddModalOpen(true);
+      setActiveTab('streams');
+    }
+  }, [activeTab]);
+
   if (!mounted) return null;
 
   const accentColor = interfaceSettings.accentColor;
 
   return (
     <div className={cn(
-      "flex-1 overflow-hidden transition-all",
+      "flex-1 overflow-hidden transition-all pb-16 md:pb-0",
       interfaceSettings.animations ? "duration-300" : "duration-0",
       sidebarOpen ? 'ml-72' : 'ml-0'
     )}>
@@ -68,6 +78,8 @@ export default function Home() {
       </div>
 
       <AddStreamModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
+      {activeTab === 'channels' && <ChannelsPage />}
+      <BottomNav onTabChange={setActiveTab} activeTab={activeTab} />
     </div>
   );
 }

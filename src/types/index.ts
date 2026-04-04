@@ -67,6 +67,7 @@ export interface NetworkSettings {
   retryDelay: number;
   exponentialBackoff: boolean;
   showDebugInfo: boolean;
+  youtubeApiKey?: string;
 }
 
 export interface SpeedTestResult {
