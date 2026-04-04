@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { LayoutGrid, Settings, Maximize2, Menu, Share2, PlusCircle, Clock, Wifi } from 'lucide-react';
+import { LayoutGrid, Settings, Maximize2, Menu, Share2, PlusCircle, Clock, Wifi, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/useAppStore';
 import { cn } from '@/lib/utils';
@@ -26,11 +26,7 @@ export const Header: React.FC = () => {
   const accentColor = interfaceSettings.accentColor;
 
   if (!time) return (
-    <header className="h-14 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-md flex items-center justify-between px-4 z-50 fixed top-0 left-0 right-0">
-      <div className="flex items-center gap-4 opacity-0">
-        <div className="w-8 h-8 bg-cyan-500 rounded-lg" />
-      </div>
-    </header>
+    <header className="h-14 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-md flex items-center justify-between px-4 z-50 fixed top-0 left-0 right-0" />
   );
 
   const activeCount = channels.length;
@@ -49,9 +45,9 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-2">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
-            style={{ backgroundColor: accentColor, boxShadow: `0 4px 12px ${accentColor}33` }}
+            style={{ backgroundColor: accentColor }}
           >
-            <LayoutGrid className="text-black h-5 w-5" />
+            <Youtube className="text-black h-5 w-5" />
           </div>
           <span className="font-black text-xl tracking-tighter text-white uppercase italic">Multilive</span>
         </div>
@@ -63,7 +59,6 @@ export const Header: React.FC = () => {
             <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{activeCount} / 12 ACTIVE</span>
           </div>
 
-          {/* Header Network Indicator */}
           <button
             onClick={() => setSettingsOpen(true)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all group"
@@ -75,7 +70,7 @@ export const Header: React.FC = () => {
               )}
             />
             <span className="hidden sm:inline text-[10px] font-black text-white/60 uppercase tracking-widest group-hover:text-white transition-colors">
-              {downloadSpeed > 0 ? `${downloadSpeed} MBPS` : 'TESTING...'}
+              {downloadSpeed > 0 ? `${downloadSpeed} MBPS` : 'SPEED TEST'}
             </span>
           </button>
         </div>
@@ -91,9 +86,6 @@ export const Header: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-1.5">
-        <Button variant="ghost" size="icon" className="text-white/40 hover:text-white hover:bg-white/5">
-          <Share2 className="h-5 w-5" />
-        </Button>
         <Button
           variant="ghost"
           size="icon"

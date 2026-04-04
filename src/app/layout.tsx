@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "MULTILIVE - Web Platform Multiview",
-  description: "Watch up to 12 live video streams simultaneously from YouTube, Twitch, and more.",
+  title: "MULTILIVE - YouTube Live Multiview",
+  description: "Watch up to 12 YouTube live video streams simultaneously on a single page with zero buffering.",
 };
 
 export default function RootLayout({
@@ -32,16 +32,10 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.youtube.com" />
         <link rel="preconnect" href="https://www.youtube-nocookie.com" />
         <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
-        <link rel="preconnect" href="https://player.twitch.tv" />
-        <link rel="dns-prefetch" href="https://player.twitch.tv" />
-        <link rel="preconnect" href="https://kick.com" />
-        <link rel="dns-prefetch" href="https://kick.com" />
-        <link rel="preconnect" href="https://www.tiktok.com" />
-        <link rel="dns-prefetch" href="https://www.tiktok.com" />
-        <link rel="preconnect" href="https://www.facebook.com" />
-        <link rel="dns-prefetch" href="https://www.facebook.com" />
-        <link rel="preconnect" href="https://rumble.com" />
-        <link rel="dns-prefetch" href="https://rumble.com" />
+        <link rel="preconnect" href="https://i.ytimg.com" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0f] text-white selection:bg-cyan-500/30`}>
         <BackgroundRenderer />

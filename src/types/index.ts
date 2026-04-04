@@ -1,13 +1,4 @@
-export type PlatformType =
-  | 'youtube'
-  | 'twitch'
-  | 'tiktok'
-  | 'kick'
-  | 'facebook'
-  | 'trovo'
-  | 'dlive'
-  | 'rumble'
-  | 'custom';
+export type PlatformType = 'youtube';
 
 export interface Channel {
   id: string;
@@ -52,9 +43,6 @@ export interface NetworkSettings {
   connectionOverride: 'auto' | 'wifi' | '4g' | '3g' | '2g' | 'slow';
   maxStreams: number;
   qualityYouTube: string;
-  qualityTwitch: string;
-  qualityKick: string;
-  qualityOther: string;
   autoQuality: boolean;
   enableBandwidthLimit: boolean;
   bandwidthLimit: number; // Mbps

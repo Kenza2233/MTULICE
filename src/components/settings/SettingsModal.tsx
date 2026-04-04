@@ -26,7 +26,8 @@ import {
   History,
   RefreshCw,
   Info,
-  Shield
+  Shield,
+  Youtube
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -94,7 +95,6 @@ export const SettingsModal: React.FC = () => {
 
     try {
       const startTime = performance.now();
-      // Fetch a small chunk of data (1MB) to measure speed
       const response = await fetch('https://raw.githubusercontent.com/julep-ai/julep/main/README.md', { cache: 'no-store' });
       const blob = await response.blob();
       const endTime = performance.now();
@@ -103,7 +103,6 @@ export const SettingsModal: React.FC = () => {
       const sizeBits = blob.size * 8;
       const speedMbps = parseFloat((sizeBits / durationSeconds / 1000000).toFixed(1));
 
-      // Get connection info if available
       interface NetworkInformation extends EventTarget {
         readonly bandwidth?: number;
         readonly rtt?: number;
@@ -222,7 +221,7 @@ export const SettingsModal: React.FC = () => {
                 >
                   Reset All
                 </button>
-                <p className="text-[9px] font-medium text-[#555] tracking-widest uppercase text-center">v1.0.0-prod</p>
+                <p className="text-[9px] font-medium text-[#555] tracking-widest uppercase text-center">v2.1.0-YouTube</p>
               </div>
             </div>
 
@@ -474,12 +473,11 @@ export const SettingsModal: React.FC = () => {
                   <SettingGroup label="QUALITY DEFAULTS" id="net-quality" collapsed={collapsedSections['net-quality']} onToggle={toggleSection} searchQuery={searchQuery}>
                      <div className="space-y-2 py-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-white/40 uppercase font-bold tracking-widest">YOUTUBE</span>
-                          <select className="bg-white/5 text-[11px] border border-white/10 rounded px-2 py-1 text-white"><option>Auto</option><option>1080p</option><option>720p</option></select>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-white/40 uppercase font-bold tracking-widest">TWITCH</span>
-                          <select className="bg-white/5 text-[11px] border border-white/10 rounded px-2 py-1 text-white"><option>Auto</option><option>Source</option><option>720p</option></select>
+                          <span className="text-[11px] text-white/40 uppercase font-bold tracking-widest flex items-center gap-2">
+                             <Youtube className="w-3.5 h-3.5 text-red-600" />
+                             YOUTUBE LIVE
+                          </span>
+                          <select className="bg-white/5 text-[11px] border border-white/10 rounded px-2 py-1 text-white"><option>Auto</option><option>1080p</option><option>720p</option><option>480p</option></select>
                         </div>
                      </div>
                   </SettingGroup>
@@ -553,7 +551,7 @@ export const SettingsModal: React.FC = () => {
                    <SettingGroup label="UPDATES" id="sys-upd" collapsed={collapsedSections['sys-upd']} onToggle={toggleSection} searchQuery={searchQuery}>
                     <div className="flex items-center justify-between py-2">
                       <span className="text-[11px] text-white/40 font-bold tracking-widest uppercase">CURRENT VERSION</span>
-                      <span className="text-xs font-mono text-cyan-500">v1.0.0-PROD</span>
+                      <span className="text-xs font-mono text-cyan-500">v2.1.0-YOUTUBE</span>
                     </div>
                     <SettingToggle label="AUTO-UPDATE" description="Check for updates automatically" checked={true} onCheckedChange={() => {}} searchQuery={searchQuery} />
                    </SettingGroup>
@@ -646,7 +644,6 @@ interface SettingGroupProps {
 }
 
 const SettingGroup: React.FC<SettingGroupProps> = ({ label, children, id, collapsed, onToggle, searchQuery }) => {
-  // If the group label matches the search, show the group and all its children
   const isGroupMatch = !searchQuery || label.toLowerCase().includes(searchQuery.toLowerCase());
 
   return (
@@ -664,7 +661,6 @@ const SettingGroup: React.FC<SettingGroupProps> = ({ label, children, id, collap
         <div className={cn("animate-in slide-in-from-top-1 duration-200", isGroupMatch ? "pl-0" : "")}>
           {React.Children.map(children, child => {
             if (React.isValidElement(child)) {
-              // Pass searchQuery to children so they can filter themselves if the group didn't match
               return React.cloneElement(child as React.ReactElement<{ searchQuery?: string }>, { searchQuery });
             }
             return child;

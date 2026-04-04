@@ -9,12 +9,7 @@ import {
   ChevronLeft,
   Tag,
   Youtube,
-  Twitch,
-  Music2,
-  Zap,
-  Facebook,
   Link as LinkIcon,
-  Monitor,
   Download,
   Upload,
   ExternalLink
@@ -22,18 +17,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AddStreamModal } from './AddStreamModal';
-
-const PLATFORM_ICONS = {
-  youtube: <Youtube className="w-3 h-3 text-red-500" />,
-  twitch: <Twitch className="w-3 h-3 text-purple-500" />,
-  tiktok: <Music2 className="w-3 h-3 text-cyan-500" />,
-  kick: <Zap className="w-3 h-3 text-green-500" />,
-  facebook: <Facebook className="w-3 h-3 text-blue-500" />,
-  rumble: <Monitor className="w-3 h-3 text-white/40" />,
-  trovo: <Monitor className="w-3 h-3 text-white/40" />,
-  dlive: <Monitor className="w-3 h-3 text-white/40" />,
-  custom: <LinkIcon className="w-3 h-3 text-white/40" />,
-};
 
 export const Sidebar: React.FC = () => {
   const {
@@ -94,8 +77,8 @@ export const Sidebar: React.FC = () => {
     >
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-          <h2 className="text-sm font-black uppercase tracking-widest text-white/70">CHANNELS</h2>
+        <div className="p-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+          <h2 className="text-sm font-black uppercase tracking-widest text-white/70">BROADCAST LIST</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -107,15 +90,15 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Search */}
-        <div className="p-4 bg-white/[0.01]">
+        <div className="p-4 bg-black/10">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-cyan-500 transition-colors" style={{ color: search ? accentColor : undefined }} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 transition-colors" style={{ color: search ? accentColor : undefined }} />
             <input
               type="text"
-              placeholder="Filter by name or tags..."
+              placeholder="Search streams..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-[10px] font-bold text-white placeholder:text-white/20 focus:outline-none transition-all uppercase tracking-widest"
+              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-[10px] font-bold text-white placeholder:text-white/10 focus:outline-none transition-all uppercase tracking-widest"
               style={{ borderColor: search ? `${accentColor}40` : undefined }}
             />
           </div>
@@ -139,13 +122,13 @@ export const Sidebar: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5 overflow-hidden">
                     <div className="w-8 h-8 rounded-lg bg-black/40 flex items-center justify-center shrink-0 border border-white/5">
-                      {PLATFORM_ICONS[channel.platform]}
+                      <Youtube className="w-3.5 h-3.5 text-red-600" />
                     </div>
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-[11px] font-black text-white/80 truncate uppercase tracking-tight">{channel.name}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[8px] font-black uppercase tracking-widest opacity-60" style={{ color: accentColor }}>{channel.platform}</span>
-                        <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-60 text-white/40">YouTube</span>
+                        <div className="w-1 h-1 rounded-full bg-red-600 animate-pulse" />
                       </div>
                     </div>
                   </div>
@@ -225,12 +208,12 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
           <Button
-            className="w-full font-black h-12 rounded-xl gap-2 shadow-lg transition-all active:scale-95"
+            className="w-full font-black h-12 rounded-xl gap-2 shadow-lg transition-all active:scale-95 uppercase tracking-widest text-xs"
             onClick={() => setIsAddModalOpen(true)}
-            style={{ backgroundColor: accentColor, color: 'black', boxShadow: `0 8px 24px ${accentColor}33` }}
+            style={{ backgroundColor: accentColor, color: 'black' }}
           >
             <Plus className="w-5 h-5" />
-            ADD CHANNEL
+            Add Stream
           </Button>
         </div>
 
